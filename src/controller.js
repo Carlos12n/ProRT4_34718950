@@ -30,6 +30,27 @@ class LibrosController {
         res.json({ "Registros eliminados": result.affectedRows });
     }
 
+    // Eliminar un libro por su ISBN
+    async deleteByISBN(req, res) {
+        const { ISBN } = req.body;
+
+  // Validación del ISBN
+        if (!/^\d{13}$/.test(ISBN)) {
+           return res.status(400).json({ error: "El campo ISBN solo admite 13 números." });
+        }
+
+        try {
+           const [result] = await pool.query(`DELETE FROM Libros WHERE ISBN = ?`, [ISBN]);
+           if (result.affectedRows === 0) {
+              return res.status(404).json({ message: "Libro no encontrado" });
+           }
+          res.json({ "Registros eliminados": result.affectedRows });
+       } catch (error) {
+      res.status(500).json({ error: "Error al eliminar el libro", details: error.message });
+     }
+    }
+
+
     // Update libro
     async update(req, res) {
         try {
